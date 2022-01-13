@@ -17,7 +17,7 @@ import org.slf4j.Logger;
 @Plugin(
         id = "servermovementmes",
         name = "ServerMovementMes",
-        version = "1.0-SNAPSHOT",
+        version = "1.1-SNAPSHOT",
         authors = {"nerrog"}
 )
 public class ServerMovementMes {
@@ -39,9 +39,7 @@ public class ServerMovementMes {
 
     private void broadcast(String message) {
         TextComponent textComponent = Component.text(message);
-        for (RegisteredServer s : this.proxyServer.getAllServers()) {
-                s.sendMessage(textComponent);
-        }
+        proxyServer.sendMessage(textComponent);
     }
 
 
