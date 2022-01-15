@@ -3,6 +3,7 @@ package net.nerrog.servermovementmes.servermovementmes;
 import com.google.inject.Inject;
 import com.velocitypowered.api.event.PostOrder;
 import com.velocitypowered.api.event.Subscribe;
+import com.velocitypowered.api.event.connection.DisconnectEvent;
 import com.velocitypowered.api.event.player.ServerConnectedEvent;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.plugin.Plugin;
@@ -17,7 +18,7 @@ import org.slf4j.Logger;
 @Plugin(
         id = "servermovementmes",
         name = "ServerMovementMes",
-        version = "1.1-SNAPSHOT",
+        version = "1.2-SNAPSHOT",
         authors = {"nerrog"}
 )
 public class ServerMovementMes {
@@ -45,13 +46,26 @@ public class ServerMovementMes {
 
     public class MoveListener {
 
-        private String MovemesBuilder(Player p, ServerInfo s){
-            return "[Proxy]"+p.getUsername()+"が"+s.getName()+"に移動しました。";
-        }
-
+        //サーバー間移動
         @Subscribe(order = PostOrder.EARLY)
         public void onServerConnected(ServerConnectedEvent e){
-            broadcast(MovemesBuilder(e.getPlayer(), e.getServer().getServerInfo()));
+            //移動前のサーバーの情報があれば移動、なければ参加
+            if (e.getPreviousServer().isPresent()){
+                broadcast(
+                        "[Proxy]"+e.getPlayer().getUsername()+"が"+e.getPreviousServer().get().getServerInfo().getName()+"から"+e.getServer().getServerInfo().getName()+"に移動しました。");
+            }else {
+                broadcast(
+                        "[Proxy]"+e.getPlayer().getUsername()+"がサーバーに参加しました");
+            }
+
         }
+
+        //プロキシから切断されるときに呼び出される
+        @Subscribe(order = PostOrder.EARLY)
+        public void OnPlayerDisconnect(DisconnectEvent e){
+            broadcast("[Proxy]"+e.getPlayer().getUsername()+"がサーバーから切断しました");
+        }
+
+
     }
 }
